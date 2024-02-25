@@ -3,7 +3,7 @@ use std::fs;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let config = parse_input(&args);
+    let config = Config::new(&args);
     println!("Searching for {} in file {}", config.target_string, config.file_path);
     let contents = fs::read_to_string(config.file_path)
         .expect("An error occurred when attempting to read from the specified file");
@@ -15,9 +15,11 @@ struct Config {
     file_path: String,
 }
 
-fn parse_input(args: &[String]) -> Config {
-    let target_string = args[1].clone();
-    let file_path = args[2].clone();
-
-    Config { target_string, file_path }
+impl Config {
+    fn new(args: &[String]) -> Config {
+        let target_string = args[1].clone();
+        let file_path = args[2].clone();
+    
+        Config { target_string, file_path }
+    }
 }
