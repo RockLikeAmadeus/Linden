@@ -9,7 +9,7 @@ fn main() {
         println!("There was a problem with the arguments provided: {err}");
         process::exit(1);
     });
-    println!("Searching for {} in file {}", config.target_string, config.file_path);
+    println!("Searching for {} in file {}.", config.target_string, config.file_path);
     if let Err(e) = linden::run(config) {
         println!("Application error: {e}");
         process::exit(1);
