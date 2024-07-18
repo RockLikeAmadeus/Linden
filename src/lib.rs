@@ -32,9 +32,10 @@ pub fn search_case_sensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str>
 }
 
 pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let query = query.to_lowercase();
     let mut results = Vec::new();
     for line in contents.lines() {
-        if line.contains(query) {
+        if line.to_lowercase().contains(&query) {
             results.push(line);
         }
     }
@@ -79,7 +80,7 @@ mod tests {
 6. thirty ThReE";
 
         assert_eq!(
-            vec!["3. three", "thirty ThReE"],
+            vec!["3. three", "6. thirty ThReE"],
             search_case_insensitive(query, contents)
         );
     }
