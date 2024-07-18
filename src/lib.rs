@@ -1,5 +1,5 @@
-use std::fs;
 use std::error::Error;
+use std::fs;
 
 pub struct Config {
     pub target_string: String,
@@ -13,12 +13,25 @@ impl Config {
         }
         let target_string = args[1].clone();
         let file_path = args[2].clone();
-    
-        Ok(Config { target_string, file_path })
+
+        Ok(Config {
+            target_string,
+            file_path,
+        })
     }
 }
 
-pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+pub fn search_case_sensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+    results
+}
+
+pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     let mut results = Vec::new();
     for line in contents.lines() {
         if line.contains(query) {
@@ -30,7 +43,7 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
-    for line in search(&config.target_string, &contents) {
+    for line in search_case_sensitive(&config.target_string, &contents) {
         println!("{line}");
     }
     Ok(())
@@ -41,15 +54,33 @@ mod tests {
     use super::*;
 
     #[test]
-    fn one_result() {
+    fn case_sensitive_search_returns_expected_result() {
         let query = "three";
         let contents = "\
 1. one
 2. two
 3. three
 4. four
-5. five";
+5. five
+6. thirty ThReE";
 
-        assert_eq!(vec!["3. three"], search(query, contents));
+        assert_eq!(vec!["3. three"], search_case_sensitive(query, contents));
+    }
+
+    #[test]
+    fn case_insensitive_search_returns_expected_result() {
+        let query = "tHrEe";
+        let contents = "\
+1. one
+2. two
+3. three
+4. four
+5. five
+6. thirty ThReE";
+
+        assert_eq!(
+            vec!["3. three", "thirty ThReE"],
+            search_case_insensitive(query, contents)
+        );
     }
 }
